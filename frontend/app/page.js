@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { useState } from "react";
 import Web3 from "web3";
-import Sweepstake from "./contract/Sweepstake.json";
+import ABI from "./contract/ABI.json"
 
-const ContractAddress = "";
+const ContractAddress = "0xf6FBB1DE25e724fF4C80D511021Fea4A207dAC80";
 
 export default function Home() {
   const [web3 , setWeb3] = useState(null);
@@ -20,10 +20,15 @@ export default function Home() {
         setWeb3(web3Instance);
 
         const accounts = await web3Instance.eth.requestAccounts();
-        setAccounts(accounts[0]);
-        const instance = new web3Instance.eth.contract(Sweepstake.abi, ContractAddress);
+        setAccounts(accounts);
+
+        const instance = new web3Instance.eth.contract(ABI, ContractAddress);
         setContract(instance);
         
+        const Contractbalance = await instance.methods.getBalance().call();
+        setBalance(Contractbalance);
+    
+
       } catch (error) {
         console.error(error)
       }
@@ -32,9 +37,24 @@ export default function Home() {
     }
   }
 
+   const enterSweepstake = async () => {
+    const accounts = await web3.eth.getAccounts();
+    const valueTosend = web3.utils.toWei("0.00001", "ether");
+
+    await Sweepstake.methods.enter().send({
+      from: accounts[0], 
+      value: valueTosend,
+      gas: 300000
+    });
+
+   }
+
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
        <button onClick={connectWallet}>Connect Wallet</button>
+       <div>
+        <button onClick={enterSweepstake}>Enter</button>
+       </div>
     </div>
   );
 }
