@@ -5,6 +5,8 @@ import { useState } from "react";
 import Web3 from "web3";
 import Sweepstake from "./contract/Sweepstake.json";
 
+const ContractAddress = "";
+
 export default function Home() {
   const [web3 , setWeb3] = useState(null);
   const [accounts, setAccounts] = useState([]);
@@ -18,15 +20,15 @@ export default function Home() {
         setWeb3(web3Instance);
 
         const accounts = await web3Instance.eth.requestAccounts();
-        setAccounts(accounts);
-
-        const networkId = await web3Instance.eth.net.getId();
+        setAccounts(accounts[0]);
+        const instance = new web3Instance.eth.contract(Sweepstake.abi, ContractAddress);
+        setContract(instance);
         
       } catch (error) {
         console.error(error)
       }
     }else{
-      console.error("web3 not found")
+      console.error("web3 not found or install metamask")
     }
   }
 
